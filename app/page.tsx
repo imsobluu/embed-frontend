@@ -18,12 +18,18 @@ export default function Home() {
 
   useEffect(() => {
     const sensorValueRef = ref(database, "sensorData");
+    let timeoutId: NodeJS.Timeout;
 
     const unsubscribe = onValue(sensorValueRef, (snapshot) => {
       if (snapshot.exists()) {
         setData(snapshot.val());
         setFirebaseStatus("Project is online");
-        setTimeout(() => setFirebaseStatus("Project is offline"), 50000);
+
+        clearTimeout(timeoutId);
+        
+        timeoutId = setTimeout(() => {
+          setFirebaseStatus("Project is offline");
+        }, 60000); // 1 minute
       } else {
         console.error("No data available");
       }
@@ -31,7 +37,10 @@ export default function Home() {
       console.error("Error fetching data: ", error);
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      clearTimeout(timeoutId);
+    }
   }, []);
 
   return (
@@ -39,15 +48,9 @@ export default function Home() {
       <h1 className="text-4xl font-bold text-center">
         Fetch Data from Firebase Realtime Database
       </h1>
-      { firebaseStatus === "Project is offline" ? (
-        <div className="text-xl font-bold text-red-500 my-10">
-          {firebaseStatus}
-        </div>
-      ) : (
-        <div className="text-xl font-bold text-green-500 my-5">
-          {firebaseStatus}
-        </div>
-      )}
+      <div className={`text-xl font-bold my-10 ${firebaseStatus === "Project is online" ? "text-green-500" : "text-red-500"}`}>
+        {firebaseStatus}
+      </div>
       {data ? (
         <div className="grid grid-cols-3 gap-11">
           <>
