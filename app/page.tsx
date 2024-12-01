@@ -8,7 +8,6 @@ interface User {
   data?: string;
 }
 
-
 export default function Home() {
   const [data, setData] = useState("");
   const [users, setUsers] = useState<User[]>([]);
