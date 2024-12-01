@@ -1,5 +1,4 @@
 "use client"
-// import { push, set } from "firebase/database"
 import { onValue, ref } from "firebase/database"
 import { useState, useEffect } from "react"
 import { database } from "./firebase";
@@ -14,7 +13,6 @@ interface SensorValues {
 }
 
 export default function Home() {
-  // const [data, setData] = useState("");
   const [data, setData] = useState<SensorValues | null>(null);
 
   useEffect(() => {
@@ -33,20 +31,6 @@ export default function Home() {
     return () => unsubscribe();
   }, []);
 
-  // const handleAddData = () => {
-  //   try {
-  //     const usersRef = ref(database, "users");
-  //     const newDataRef = push(usersRef);
-
-  //     set(newDataRef, {
-  //       data: data,
-  //     });
-  //     setData("");
-  //     alert("Data added successfully");
-  //   } catch (error) {
-  //     console.error("Error adding data: ", error);
-  //   }
-  // }
   return (
     <div className="flex min-h-screen flex-col items-center p-12">
       <h1 className="text-4xl font-bold text-center my-10">
