@@ -18,7 +18,7 @@ export default function Home() {
   const [data, setData] = useState<SensorValues | null>(null);
 
   useEffect(() => {
-    const sensorValueRef = ref(database, "sensorValue");
+    const sensorValueRef = ref(database, "sensorData");
     get(sensorValueRef).then((snapshot) => {
       if (snapshot.exists()) {
         setData(snapshot.val());
