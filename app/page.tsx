@@ -2,18 +2,19 @@
 import { onValue, ref } from "firebase/database"
 import { useState, useEffect } from "react"
 import { database } from "./firebase";
+import Lightbulb from "@/components/Lightbulb";
+import Microphone from "@/components/Microphone";
+import Thermostat from "@/components/Thermostat";
 
 interface SensorValues {
   ldrValue: number;
   micValue: number;
-  mq2AnalogValue: number;
-  mq2DigitalValue: number;
-  t447Value: number;
   temperature: number;
 }
 
 export default function Home() {
   const [data, setData] = useState<SensorValues | null>(null);
+  const [firebaseStatus, setFirebaseStatus] = useState<string>("Project is offline");
 
   useEffect(() => {
     const sensorValueRef = ref(database, "sensorData");
@@ -21,6 +22,8 @@ export default function Home() {
     const unsubscribe = onValue(sensorValueRef, (snapshot) => {
       if (snapshot.exists()) {
         setData(snapshot.val());
+        setFirebaseStatus("Project is online");
+        setTimeout(() => setFirebaseStatus("Project is offline"), 50000);
       } else {
         console.error("No data available");
       }
@@ -33,29 +36,41 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col items-center p-12">
-      <h1 className="text-4xl font-bold text-center my-10">
+      <h1 className="text-4xl font-bold text-center">
         Fetch Data from Firebase Realtime Database
       </h1>
+      { firebaseStatus === "Project is offline" ? (
+        <div className="text-xl font-bold text-red-500 my-10">
+          {firebaseStatus}
+        </div>
+      ) : (
+        <div className="text-xl font-bold text-green-500 my-5">
+          {firebaseStatus}
+        </div>
+      )}
       {data ? (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-11">
           <>
-            <div className="bg-gray-100 p-4 rounded-lg">
-              <h2 className="text-2xl text-gray-900">LDR Value: {data.ldrValue}</h2>
+            <div className="bg-black p-4 rounded-2xl flex flex-col justify-center items-center">
+              <Lightbulb 
+                brightness={data.ldrValue}
+              />
+              <h2 className="text-2xl text-gray-100">LDR Value</h2>
+              <h2 className="text-2xl text-gray-100">{data.ldrValue}</h2>
             </div>
-            <div className="bg-gray-100 p-4 rounded-lg">
-              <h2 className="text-2xl text-gray-900">Mic Value: {data.micValue}</h2>
+            <div className="bg-black p-4 rounded-2xl flex flex-col justify-center items-center">
+              <Microphone
+                loudness={data.micValue}
+              />
+              <h2 className="text-2xl text-gray-100">Mic Value</h2>
+              <h2 className="text-2xl text-gray-100">{data.micValue}</h2>
             </div>
-            <div className="bg-gray-100 p-4 rounded-lg">
-              <h2 className="text-2xl text-gray-900">MQ2 Analog Value: {data.mq2AnalogValue}</h2>
-            </div>
-            <div className="bg-gray-100 p-4 rounded-lg">
-              <h2 className="text-2xl text-gray-900">MQ2 Digital Value: {data.mq2DigitalValue}</h2>
-            </div>
-            <div className="bg-gray-100 p-4 rounded-lg">
-              <h2 className="text-2xl text-gray-900">T447 Value: {data.t447Value}</h2>
-            </div>
-            <div className="bg-gray-100 p-4 rounded-lg">
-              <h2 className="text-2xl text-gray-900">Temperature: {data.temperature}</h2>
+            <div className="bg-black p-4 rounded-2xl flex flex-col justify-center items-center">
+              <Thermostat
+                temperature={data.temperature}
+              />
+              <h2 className="text-2xl text-gray-100">Temperature</h2>
+              <h2 className="text-2xl text-gray-100">{data.temperature}</h2>
             </div>
           </>
         </div>

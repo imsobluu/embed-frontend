@@ -32,12 +32,9 @@ const db = admin.database();
 
 // Define a function to generate random values for sensor data
 const generateRandomSensorValues = () => ({
-  ldrValue: Math.floor(Math.random() * 1024), // Random value between 0 and 1023
-  micValue: Math.floor(Math.random() * 100),  // Random value between 0 and 99
-  mq2AnalogValue: Math.floor(Math.random() * 1024), // Random value between 0 and 1023
-  mq2DigitalValue: Math.random() > 0.5 ? 1 : 0, // Random binary value (0 or 1)
-  t447Value: Math.floor(Math.random() * 50), // Random value between 0 and 49
-  temperature: parseFloat((Math.random() * 40).toFixed(2)), // Random temperature value between 0 and 40°C
+  ldrValue: Math.floor(Math.random() * 1001),
+  micValue: Math.floor(Math.random() * 101),  
+  temperature: Math.floor(Math.random() * (150 - (-55) + 1)) + (-55),
 });
 
 // Function to update the sensor data in Firebase RTDB
