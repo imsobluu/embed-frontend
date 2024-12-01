@@ -1,6 +1,6 @@
 "use client"
 // import { push, set } from "firebase/database"
-import { get, ref } from "firebase/database"
+import { onValue, ref } from "firebase/database"
 import { useState, useEffect } from "react"
 import { database } from "./firebase";
 
@@ -19,15 +19,18 @@ export default function Home() {
 
   useEffect(() => {
     const sensorValueRef = ref(database, "sensorData");
-    get(sensorValueRef).then((snapshot) => {
+
+    const unsubscribe = onValue(sensorValueRef, (snapshot) => {
       if (snapshot.exists()) {
         setData(snapshot.val());
       } else {
         console.error("No data available");
       }
-    }).catch((error) => {
+    }, (error) => {
       console.error("Error fetching data: ", error);
     });
+
+    return () => unsubscribe();
   }, []);
 
   // const handleAddData = () => {
