@@ -15,19 +15,18 @@ interface SensorValues {
 
 async function sendGoogleSheetData(sheetData: SensorValues) {
   try {
-    const result = await axios.post('https://api.sheetbest.com/sheets/cf833c1f-87a6-4186-92c3-0830c3dbe5a5', sheetData);
+    const result = await axios.post(process.env.NEXT_PUBLIC_GOOGLE_SHEETS_URL as string, sheetData, { timeout: 100000});
     console.log("Data sent to Google Sheets:", result.data);
   } catch (error) {
     console.error("Error sending data to Google Sheets:", error);
   }
-}
+}   
 
 export default function Home() {
   const [data, setData] = useState<SensorValues | null>(null);
   const [firebaseStatus, setFirebaseStatus] = useState<string>("offline");
   const [text, setText] = useState<string>("");
   const [isActive, setIsActive] = useState<boolean>(false);
-
 
   const handleSendSensorDataMultipleTimes = () => {
     const sensorData = {
@@ -38,9 +37,8 @@ export default function Home() {
 
     const dbRef = ref(database, "sensorData");
 
-
     const sendInterval = 1000; // Send data every 1 second
-    const totalDuration = 10000; // Total duration: 5 seconds
+    const totalDuration = 10000; // Total duration: 10 seconds
 
     const intervalId = setInterval(() => {
       set(dbRef, sensorData)
@@ -52,19 +50,15 @@ export default function Home() {
         });
     }, sendInterval);
 
-    // Stop sending after 5 seconds
+    // Stop sending after 10 seconds
     setTimeout(() => {
       clearInterval(intervalId);
-      console.log("Stopped sending data after 5 seconds");
+      console.log("Stopped sending data after 10 seconds");
     }, totalDuration);
   };
 
 
   useEffect(() => {
-    // console.log(String(text).trim().toLowerCase());
-    // if ((text as string).trim() === "Alert on.") {
-    //   handleSendSensorDataMultipleTimes();
-    // }
     if (text == 'Alert on.') {
       console.log("Sending sensor data multiple times...");
       console.log(text)
@@ -170,10 +164,8 @@ export default function Home() {
               <h2 className="text-2xl text-gray-100">Temperature</h2>
               <h2 className="text-2xl text-gray-100">{Math.floor(data.temperature)}</h2>
             </div>
-            <div className="bg-black p-4 rounded-2xl flex flex-col justify-center items-center" onClick={handleOnSpeech}>
-
-              <h2 className="text-2xl text-gray-100">Text:</h2>
-              <h2 className="text-2xl text-gray-100">{isActive ? 'say something' : text}</h2>
+            <div className="bg-black p-4 rounded-2xl flex flex-row col-span-3" onClick={handleOnSpeech}>
+              <h2 className="text-2xl text-gray-100">Text : {isActive ? text : 'Say something'}</h2>
             </div>
           </>
         </div>
