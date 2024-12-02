@@ -3,6 +3,7 @@ name: Firebase Database Status Check
 on:
   schedule:
     - cron: "0 * * * *" # Run every hour (0th minute of every hour)
+  workflow_dispatch:  # This allows manual triggering
 
 jobs:
   check-database-status:
@@ -23,6 +24,6 @@ jobs:
         run: npx ts-node -r tsconfig-paths/register ./app/api/statusTracker/route.ts
         env:
           FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
-          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
           FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
-          FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+          NEXT_PUBLIC_FIREBASE_DATABASE_URL: ${{ secrets.NEXT_PUBLIC_FIREBASE_DATABASE_URL }}
