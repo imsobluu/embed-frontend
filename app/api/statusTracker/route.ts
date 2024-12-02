@@ -17,6 +17,14 @@ if (!projectId || !clientEmail || !privateKey) {
   throw new Error("Missing Firebase configuration environment variables");
 }
 
+let databaseURL;
+
+if (process.env.NODE_ENV == 'development') {
+  databaseURL = `http://127.0.0.1:9000?ns=embed-firebase-default-rtdb`;
+} else {
+  databaseURL = process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL;
+}
+
 if (getApps().length === 0) {
   admin.initializeApp({
     credential: admin.credential.cert({
@@ -24,7 +32,7 @@ if (getApps().length === 0) {
       clientEmail,
       privateKey,
     }),
-    databaseURL: `http://127.0.0.1:9000?ns=embed-firebase-default-rtdb`,
+    databaseURL,
   });
 } else {
   // If the app is already initialized, you can use it
