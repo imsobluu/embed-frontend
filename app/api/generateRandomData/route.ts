@@ -1,4 +1,5 @@
 import * as admin from 'firebase-admin';
+import { getApps } from 'firebase-admin/app';
 import { config } from 'dotenv';
 
 // Load environment variables from .env file
@@ -16,17 +17,19 @@ if (!projectId || !clientEmail || !privateKey) {
   throw new Error("Missing Firebase configuration environment variables");
 }
 
-
-
-// Initialize Firebase Admin SDK
-admin.initializeApp({
-  credential: admin.credential.cert({
-    projectId,
-    clientEmail,
-    privateKey,
-  }),
-  databaseURL: `http://127.0.0.1:9000?ns=embed-firebase-default-rtdb`,
-});
+if (getApps().length === 0) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId,
+      clientEmail,
+      privateKey,
+    }),
+    databaseURL: `http://127.0.0.1:9000?ns=embed-firebase-default-rtdb`,
+  });
+} else {
+  // If the app is already initialized, you can use it
+  console.log("Firebase app already initialized");
+}
 
 const db = admin.database();
 
