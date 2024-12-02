@@ -3,6 +3,7 @@ name: Firebase Database Status Check
 on:
   schedule:
     - cron: "0 * * * *" # Run every hour (0th minute of every hour)
+  workflow_dispatch:  # This allows manual triggering
 
 jobs:
   check-database-status:
