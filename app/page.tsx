@@ -1,5 +1,5 @@
 "use client"
-import { DatabaseReference, onValue, ref, set } from "firebase/database"
+import { onValue, ref, set } from "firebase/database"
 import axios from "axios";
 import { useState, useEffect } from "react"
 import { database } from "./firebase";
@@ -184,8 +184,5 @@ export default function Home() {
       )}
     </div>
   );
-}
-function push(dbRef: DatabaseReference) {
-  throw new Error("Function not implemented.");
 }
 
