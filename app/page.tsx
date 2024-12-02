@@ -20,7 +20,6 @@ export default function Home() {
   useEffect(() => {
     const sensorValueRef = ref(database, "sensorData");
     const statusRef = ref(database, "databaseStatus");
-    let timeoutId: NodeJS.Timeout;
 
     const unsubscribeStatus = onValue(statusRef, (snapshot) => {
       if (snapshot.exists()) {
@@ -37,13 +36,7 @@ export default function Home() {
       let newData ;
       if (snapshot.exists()) {
         setData(snapshot.val());
-        setFirebaseStatus("Project is online");
         newData = snapshot.val();
-        clearTimeout(timeoutId);
-        
-        timeoutId = setTimeout(() => {
-          setFirebaseStatus("Project is offline");
-        }, 60000); // 1 minute
       } else {
         console.error("No data available");
       }
