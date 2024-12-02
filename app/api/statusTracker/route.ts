@@ -98,6 +98,10 @@ const checkDatabaseStatus = () => {
     });
 };
 
-setInterval(checkDatabaseStatus, 60000);
+if (process.env.NODE_ENV == 'development') {
+  setInterval(checkDatabaseStatus, 60000);
+} else {
+  checkDatabaseStatus();
+}
 
 trackDatabaseUpdates();
