@@ -1,5 +1,6 @@
 "use client"
 import { onValue, ref } from "firebase/database"
+import axios from "axios";
 import { useState, useEffect } from "react"
 import { database } from "./firebase";
 import Lightbulb from "@/components/Lightbulb";
@@ -8,7 +9,7 @@ import Thermostat from "@/components/Thermostat";
 
 interface SensorValues {
   ldrValue: number;
-  micValue: number;
+  micValue: number; 
   temperature: number;
 }
 
@@ -19,6 +20,7 @@ export default function Home() {
   useEffect(() => {
     const sensorValueRef = ref(database, "sensorData");
     const statusRef = ref(database, "databaseStatus");
+    let timeoutId: NodeJS.Timeout;
 
     const unsubscribeStatus = onValue(statusRef, (snapshot) => {
       if (snapshot.exists()) {
@@ -32,11 +34,20 @@ export default function Home() {
     });
 
     const unsubscribe = onValue(sensorValueRef, (snapshot) => {
+      let newData ;
       if (snapshot.exists()) {
         setData(snapshot.val());
+        setFirebaseStatus("Project is online");
+        newData = snapshot.val();
+        clearTimeout(timeoutId);
+        
+        timeoutId = setTimeout(() => {
+          setFirebaseStatus("Project is offline");
+        }, 60000); // 1 minute
       } else {
         console.error("No data available");
       }
+      submitSheetHandler(newData);
     }, (error) => {
       console.error("Error fetching data: ", error);
     });
@@ -47,6 +58,21 @@ export default function Home() {
     }
   }, []);
 
+  const submitSheetHandler = async (sensorData: SensorValues) => {
+    const sheetData = {
+      "ldrValue": sensorData.ldrValue,
+      "micValue": sensorData.micValue,
+      "temperature": sensorData.temperature,
+      "timestamp": new Date().toISOString()
+    };
+
+    try {
+      const result = await axios.post('https://api.sheetbest.com/sheets/cf833c1f-87a6-4186-92c3-0830c3dbe5a5', sheetData);
+      console.log("Data sent to Google Sheets:", result.data);
+    } catch (error) {
+      console.error("Error sending data to Google Sheets:", error);
+    }
+  }
   return (
     <div className="flex min-h-screen flex-col items-center p-12">
       <h1 className="text-4xl font-bold text-center">
