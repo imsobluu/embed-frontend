@@ -14,22 +14,26 @@ interface SensorValues {
 
 export default function Home() {
   const [data, setData] = useState<SensorValues | null>(null);
-  const [firebaseStatus, setFirebaseStatus] = useState<string>("Project is offline");
+  const [firebaseStatus, setFirebaseStatus] = useState<string>("offline");
 
   useEffect(() => {
     const sensorValueRef = ref(database, "sensorData");
-    let timeoutId: NodeJS.Timeout;
+    const statusRef = ref(database, "databaseStatus");
+
+    const unsubscribeStatus = onValue(statusRef, (snapshot) => {
+      if (snapshot.exists()) {
+        console.log("Firebase status snapshot: ", snapshot.val());
+        setFirebaseStatus(snapshot.val());
+      } else {
+        console.error("Database status not available");
+      }
+    }, (error) => {
+      console.error("Error fetching status: ", error);
+    });
 
     const unsubscribe = onValue(sensorValueRef, (snapshot) => {
       if (snapshot.exists()) {
         setData(snapshot.val());
-        setFirebaseStatus("Project is online");
-
-        clearTimeout(timeoutId);
-        
-        timeoutId = setTimeout(() => {
-          setFirebaseStatus("Project is offline");
-        }, 60000); // 1 minute
       } else {
         console.error("No data available");
       }
@@ -39,7 +43,7 @@ export default function Home() {
 
     return () => {
       unsubscribe();
-      clearTimeout(timeoutId);
+      unsubscribeStatus();
     }
   }, []);
 
@@ -48,8 +52,8 @@ export default function Home() {
       <h1 className="text-4xl font-bold text-center">
         Fetch Data from Firebase Realtime Database
       </h1>
-      <div className={`text-xl font-bold my-10 ${firebaseStatus === "Project is online" ? "text-green-500" : "text-red-500"}`}>
-        {firebaseStatus}
+      <div className={`text-xl font-bold my-10 ${firebaseStatus === "online" ? "text-green-500" : "text-red-500"}`}>
+        Project Status : {firebaseStatus ? firebaseStatus : "offline"}
       </div>
       {data ? (
         <div className="grid grid-cols-3 gap-11">
