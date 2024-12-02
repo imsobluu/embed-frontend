@@ -89,8 +89,7 @@ const checkDatabaseStatus = () => {
       const currentTime = Date.now();
       const timeDifference = currentTime - lastUpdateTime;
   
-      // If the time difference is less than 1 minute (60,000 milliseconds), set as 'online'
-      if (timeDifference < 60000) {
+      if (timeDifference < 600000) {
         updateDatabaseStatus('online');
       } else {
         updateDatabaseStatus('offline');
@@ -98,10 +97,6 @@ const checkDatabaseStatus = () => {
     });
 };
 
-if (process.env.NODE_ENV == 'development') {
-  setInterval(checkDatabaseStatus, 60000);
-} else {
-  checkDatabaseStatus();
-}
+setInterval(checkDatabaseStatus, 60000);
 
 trackDatabaseUpdates();
